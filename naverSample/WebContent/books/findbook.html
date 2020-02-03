@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>9_openapi/findbook.html</title>
+<style type="text/css">
+	#booklist p{
+		width:70%;
+		height:180%;
+		background: #ccc;
+		border: 3px solid green;
+		margin:10px;
+		font-size:.8em;
+		padding:10px;
+		border-radius: 20px;
+	}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script type="text/javascript">
+	$(function(){
+		var start=1;
+		// Search() 함수 정의
+		function Search() {
+			$("#booklist").empty();//검색할때마다 싹비워주기
+			var search=$("#search").val();//검색어
+			if(search == "") {
+				alert("도서명을 입력하세요..!");
+				return;
+			}
+			start=1;
+			$.ajax({
+				url:"findbook.jsp",
+				data:{search:search,start:start},//jsp로 보내질 파라미터
+				dataType:"xml",
+				success:function(data){
+					//alert(data);
+					$(data).find("item").each(function(){
+						var title=$(this).find("title").text();
+						var price=$(this).find("price").text();
+						var img=$(this).find("image").text();
+						price = numberComma(price); //천단위 콤마변환
+						var str="<p>도서명:"+title+"<br>" +
+								"가격:"+price +"원<br>" +
+								"이미지<br><img src='"+img +"'><br>" +
+								"</p>";
+						$("#booklist").append(str);
+					});
+				}
+			});
+		}
+		// '찾기' 버튼 누를 시, 결과 출력 
+		$("#btn_search").click(function(){
+			Search(); //상위의 Search함수 호출
+		});
+		// Enter누를 시, 결과 출력
+		$("#search").keydown(function(key) {
+			if(key.keyCode == 13) {
+				Search();
+			}
+		});
+		$("#btn_more").click(function(){//더보기버튼
+			var search=$("#search").val();//검색어
+			if(search == "") {
+				alert("도서명을 입력하세요..!");
+				return;
+			}
+			start += 5;
+			$.ajax({
+				url:"findbook.jsp",
+				data:{search:search,start:start},//jsp로 보내질 파라미터
+				dataType:"xml",
+				success:function(data){
+					//alert(data);
+					$(data).find("item").each(function(){
+						var title=$(this).find("title").text();
+						var price=$(this).find("price").text();
+						var img=$(this).find("image").text();
+						price = numberComma(price); //천단위콤마 변환
+						var str="<p>도서명:"+title+"<br>" +
+								"가격:"+price +"원<br>" +
+								"이미지<br><img src='"+img +"'><br>" +
+								"</p>";
+						$("#booklist").append(str);
+						var height=$("#contents").height()+500;
+						$(window).scrollTop(height);
+					});
+				}
+			});
+		});
+		//천단위콤마 찍어주는 함수
+		function numberComma(number) {
+    		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+	});
+</script>
+</head>
+<body>
+<div id="contents">
+	<h1 style="display: inline">도서검색</h1>&nbsp;&nbsp;
+	<a href="../info.html">뒤로</a><br><br>
+	검색어 <input type="text" id="search" placeholder="도서명을 입력하세요">
+	<input type="button" value="찾기" id="btn_search">
+	<div id="booklist"></div>
+</div>
+<p>
+	<input type="button" value="더보기" id="btn_more">
+</p>
+</body>
+</html>

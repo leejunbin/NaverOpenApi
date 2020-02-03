@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<style type="text/css">
+	#newslist p{
+		width:80%;
+		height:180%;
+		background: #ccc;
+		border: 3px solid green;
+		margin:10px;
+		font-size:1em;
+		padding:10px;
+		border-radius: 20px;
+	}
+	#newsDetail {
+		display: none;
+	}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+	$(function () {
+		var start = 1; // start default 값 설정
+		var checkCode = 0; // 더보기버튼 및 기본찾기 버튼 판별변수 ; checkCode -> 0 : 기본찾기; checkCode -> 1 : 더보기
+		var listNum = 1;
+		// ajax 통신코드 Search함수 지정
+		function Search() {
+			if(checkCode == 0) {
+				$("#newslist").empty(); // 검색할때마다 리스트 초기
+				start = 1;
+				listNum = 1;
+			}else {
+				start += 11;
+			}
+			var text = $("#text").val(); // 현재 input란에 있는 키워드 가져오기
+			if(text == "") {
+				alert("키워드를 입력하세요..!");
+				return;
+			}
+			$.ajax({
+				type: "GET",
+				url: "news.jsp",
+				dataType: "xml",
+				data: {text : text, start: start},
+				success: function (data) {
+					//alert('통신완료');
+					$(data).find("item").each(function(){
+						var title = $(this).find("title").text();
+						var originallink = $(this).find("originallink").text();
+						var link = $(this).find("link").text();
+						var description = $(this).find("description").text();
+						var pubDate = $(this).find("pubDate").text();
+						var str = "<p>"+ listNum + ". <a href='"+ originallink + "' target='_blank'>" + title +"</a> // " +
+							"<a href='"+ link + "' target='_blank'>네이버뉴스 링크</a>  <input type='button' id='detail' value='개략'/>" + 
+							pubDate + "<br><span id='newsDetail'>"+description+"</span></p>";
+						$("#newslist").append(str);
+						listNum += 1;
+						checkCode = 0;
+					});
+					//더보기를 할 시, 스크롤을 아래로 내려가게 해줌
+					var height=$("#contents").height()-800;
+					$(window).scrollTop(height);
+				},
+				error: function(xhr, status, error){
+					alert('에러발생');
+				}
+			});
+		}
+		// 검색버튼 클릭 시, Search 함수 호출
+		$("#btn_search").click(function () {
+			Search();
+		});
+		// Enter눌렀을 시, Search 함수 호출
+		$("#text").keydown(function(key){
+			if(key.keyCode == 13) {
+				Search();
+			}
+		});
+		// 더보기 버튼 클릭 시, 하위리스트 추가
+		$("#btn_more").click(function() {
+			checkCode = 1;
+			Search();
+		});
+		// Detail(개략)버튼 클릭 시, detail display속성을 변경해줌
+		$(document).on('click',"#detail",function(){
+			var variable = $(this).next().next();
+			if(variable.css("display") == "none") {
+				variable.css("display", "block");
+				$(this).val("닫기");
+			}else {
+				variable.css("display", "none");
+				$(this).val("개략");
+			}
+		});
+	});
+</script>
+</head>
+<body>
+<div id="contents">
+	<h1 style="display: inline">뉴스검색</h1>&nbsp;&nbsp;
+	<a href="../info.html">뒤로</a><br><br>
+	검색어 <input type="text" id="text" placeholder="키워드를 입력하세요.">
+	<input type="button" value="찾기" id="btn_search">
+	<div id="newslist"></div>
+</div>
+<p>
+	<input type="button" value="더보기" id="btn_more">
+</p>
+</body>
+</html>

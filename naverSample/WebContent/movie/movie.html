@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>movie</title>
+<style type="text/css">
+	#movielist p{
+		width:50%;
+		height:180%;
+		background: #ccc;
+		border: 3px solid green;
+		margin:10px;
+		font-size:1em;
+		padding:10px;
+		border-radius: 20px;
+		overflow: hidden;
+	}
+	#movieDetail {
+		display: none;
+	}
+	#text{
+		width: 245px;
+	}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+	$(function() {
+		var checkCode = 0; // 더보기버튼 및 기본찾기 버튼 판별변수 ; checkCode -> 0 : 기본찾기; checkCode -> 1 : 더보기
+		var listNum = 1;
+		var start = 1;
+		function Search() {
+			var genre = $("select[name='genre']").val(); // 장르번호 받기
+			var country = $("select[name='country']").val(); // 국가코드 받기
+			var text = $("#text").val();
+			if(genre == "0" || country == "empty") {
+				alert("장르 혹은 국가를 선택하세요..!");
+				return;
+			}
+			if(checkCode == 0) {
+				$("#movielist").empty(); // 검색할때마다 리스트 초기
+				start = 1;
+				listNum = 1;
+			}else {
+				start += 11;
+			}
+			$.ajax({
+				type: "GET",
+				url: "movieapi.jsp",
+				dataType: "xml",
+				data: {start:start,text:text,genre:genre,country:country},
+				success: function(data){
+					$(data).find("item").each(function(){
+						var title = $(this).find("title").text(); //영화제목
+						var link = $(this).find("link").text(); //영화링크
+						var image = $(this).find("image").text(); //영화이미지
+						var subtitle = $(this).find("subtitle").text(); //영문제목
+						var pubDate = $(this).find("pubDate").text(); //제작년도
+						var director = $(this).find("director").text(); //영화감독
+						var actor = $(this).find("actor").text(); //출연배우
+						var userRating = $(this).find("userRating").text(); //유저평점
+						var str = `<p> ${listNum}.<br>
+								   <img src="${image}" style="display:block;float:left">
+								   Title: ${title}(${pubDate}) || ${subtitle} <br>
+								   Director: ${director} <br>
+								   Actor: ${actor} <br>
+								   Rating: ${userRating} <br>
+								   Link: <a href="${link}" target="_blank">네이버링크</a></p>`;
+						$("#movielist").append(str);
+						listNum += 1;
+						checkCode = 0;
+					});
+				}
+			});
+		}
+
+		$("#btn_search").click(function() {
+			Search();
+		});
+
+		// Enter눌렀을 시, Search 함수 호출
+		$("#text").keydown(function(key){
+			if(key.keyCode == 13) {
+				Search();
+			}
+		});
+
+		// 더보기 버튼 클릭 시, 하위리스트 추가
+		$("#btn_more").click(function() {
+			checkCode = 1;
+			Search();
+		});
+	});
+</script>
+</head>
+<body>
+<div id="contents">
+	<h1 style="display: inline">m검색</h1>&nbsp;&nbsp;
+	<a href="../info.html">뒤로</a><br><br>
+	<select id="genre" name="genre">
+		<option value="0" selected>--장르선택--</option>
+		<option value="1">드라마</option>
+		<option value="2">판타지</option>
+		<option value="4">공포</option>
+		<option value="7">스릴러</option>
+		<option value="8">느와르</option>
+		<option value="18">SF</option>
+		<option value="19">액션</option>
+	</select>
+	<select id="country" name="country">
+		<option value="empty" selected>--국가선택--</option>
+		<option value="KR">한국</option>
+		<option value="JP">일본</option>
+		<option value="US">미국</option>
+		<option value="HK">홍콩 </option>
+		<option value="ETC">기타</option>
+	</select>
+	<br>
+	검색어 <input type="text" id="text" placeholder="제목을 입력하시오(기본값:반지의제왕)">
+	<input type="button" value="찾기" id="btn_search">
+	<div id="movielist"></div>
+</div>
+<p>
+	<input type="button" value="더보기" id="btn_more">
+</p>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+

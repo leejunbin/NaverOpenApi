@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Shopping</title>
+<style type="text/css">
+	#shoppinglist p{
+		width:90%;
+		height:180%;
+		background: #ccc;
+		border: 3px solid green;
+		margin:10px;
+		font-size:1em;
+		padding:10px;
+		border-radius: 20px;
+		overflow: hidden;
+	}
+	#shoppingDetail {
+		display: none;
+	}
+	#text{
+		width: 240px;
+	}
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script>
+	$(function(){
+		var checkCode = 0; // 더보기버튼 및 기본찾기 버튼 판별변수 ; checkCode -> 0 : 기본찾기; checkCode -> 1 : 더보기
+		var listNum = 1;
+		var start = 1;
+		function Search() {
+			var sort = $("select[name='sort']").val(); //분류별 코드 받기
+			var text = $("#text").val();
+			if(sort == "empty"){
+				alert("항목을 선택하세요..!");
+				return;
+			}
+			if(checkCode == 0) {
+				$("#shoppinglist").empty(); // 검색할때마다 리스트 초기
+				start = 1;
+				listNum = 1;
+			}else {
+				start += 11;
+			}
+			$.ajax({
+				type: "GET",
+				url: "shopping.jsp",
+				dataType: "xml",
+				data: {start:start,text:text,sort:sort},
+				success: function(data){
+					//alert('요청완료!');
+					$(data).find("item").each(function() {
+						var title = $(this).find("title").text(); //물품명
+						var image = $(this).find("image").text(); //물품이미지
+						var link = $(this).find("link").text(); //링크
+						var lprice = $(this).find("lprice").text(); //최저가
+						var hprice = $(this).find("hprice").text(); //최고가
+						var mallName = $(this).find("mallName").text(); //쇼핑몰 상호
+						var productId = $(this).find("productId").text(); //상품ID(Integer)
+						var productType = $(this).find("productType").text(); //상품군정보
+						if(Number(productType) >= 1 && Number(productType) <= 3) {
+							productType = "일반상품";
+						}else if(Number(productType) >= 4 && Number(productType) <= 6) {
+							productType = "중고상품";
+						}else if(Number(productType) >= 7 && Number(productType) <= 9) {
+							productType = "단종상품";
+						}else if(Number(productType) >= 10 && Number(productType) <= 12) {
+							productType = "판매예정상품";
+						}
+						lprice = numberComma(lprice); //천단위콤마 표현
+						hprice = numberComma(hprice); //천단위콤마 표현
+						var str = `<p> ${listNum}.<br>
+								   <img src="${image}" style="display:block;float:left">
+								       물품명: ${title}<br>
+								       최저가: ${lprice}원 <br>
+								       최고가: ${hprice}원 <br>
+								       쇼핑몰상호: ${mallName} <br>
+								       상품군: ${productType} <br>  
+								       링크: <a href="${link}" target="_blank">쇼핑몰링크</a></p>`;
+						$("#shoppinglist").append(str);
+						listNum += 1;
+						checkCode = 0;
+					});
+				}
+			});
+		}
+
+		$("#btn_search").click(function() {
+			Search();
+		});
+		// Enter눌렀을 시, Search 함수 호출
+		$("#text").keydown(function(key){
+			if(key.keyCode == 13) {
+				Search();
+			}
+		});
+		// 더보기 버튼 클릭 시, 하위리스트 추가
+		$("#btn_more").click(function() {
+			checkCode = 1;
+			Search();
+		});
+		//천단위콤마 찍어주는 함수
+		function numberComma(number) {
+    		return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+		}
+	});
+</script>
+</head>
+<body>
+<h1 style="display: inline">Shopping Search</h1>&nbsp;&nbsp;
+<a href="../info.html">뒤로</a><br><br>
+<div id="contents">
+	구분   <select id="sort" name="sort">
+		<option value="empty" selected>--선택--</option>
+		<option value="sim">유사도순</option>
+		<option value="date">날짜순</option>
+		<option value="dsc">가격높은순</option>
+		<option value="asc">낮은가격순 </option>
+	</select> <br>
+	검색어 <input type="text" id="text" placeholder="물품을 입력하시오(기본값 : 독서대)">
+	<input type="button" value="찾기" id="btn_search">
+	<div id="shoppinglist"></div>
+</div>
+<p>
+	<input type="button" value="더보기" id="btn_more">
+</p>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,40 +1,51 @@
 @charset "UTF-8";
-.dropdown-button {
+.search-button, .map-button {
 	background-color: #FFDAB9;
 	padding: 8px;
 	font-size: 15px;
 	border: none;
 }
+#navi {
+	background-color: #BDBDBD;
+}
 
-.dropdown {
+.search, .map {
 	position: relative;
 	display: inline-block;
 }
 
-.dropdown-content {
+.search-content, .map-content {
 	display: none;
 	position: absolute;
 	background-color: #FFDAB9;
-	min-width: 75px;
+	min-width: 100px;
 	padding: 5px;
 	box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
 }
 
-.dropdown-content a {
+.search-content a, .map-content a {
 	color: black;
 	padding: 8px;
 	text-decoration: none;
 	display: block;
 }
 
-.dropdown-content a:hover {
+.search-content a:hover, .map-content a:hover {
 	background-color: #CD853F;
 }
 
-.dropdown:hover .dropdown-content {
+.search:hover .search-content, .map:hover .map-content {
 	display: block;
 }
 
-.dropdown:hover .dropdown-button {
+.search:hover .search-button, .map:hover .map-button {
 	background-color: #CD853F;
+}
+input[id="chkTraffic"] {
+	width: 25px;
+	transform: scale(1.5);
+}
+input[id="chkBicycle"] {
+	width: 25px;
+	transform: scale(1.5);
 }

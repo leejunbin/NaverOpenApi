@@ -12,12 +12,16 @@
 
 <body>
 	<h2>기본지도</h2>
-	<div id="map" style="width:500px;height:400px;margin:auto"></div>
+	<div id="map" style="width:700px;height:400px;margin:auto"></div>
 	<div id="chk" style="text-align: center">
 		<input type="checkbox" id="chkTraffic" onClick="setOverlayMapTypeId();">
 		<label for="chkTraffic">교통정보 보기</label>
 		<input type="checkbox" id="chkBicycle" onClick="setOverlayMapTypeId();">
 		<label for="chkBicycle">자전거도로 보기</label>
+		<input type="checkbox" id="chkUseDistrict" onClick="setOverlayMapTypeId();">
+		<label for="chkUseDistrict">지적편집도정보 보기</label>
+		<input type="checkbox" id="chkTerrain" onClick="setOverlayMapTypeId();">
+		<label for="chkTerrain">지형정보 보기</label>
 	</div>
 	<script>
 		var container = document.getElementById('map');
@@ -29,6 +33,8 @@
 		var mapTypes = {
 			traffic: kakao.maps.MapTypeId.TRAFFIC,
 			bicycle: kakao.maps.MapTypeId.BICYCLE,
+			terrain : kakao.maps.MapTypeId.TERRAIN,
+			useDistrict : kakao.maps.MapTypeId.USE_DISTRICT
 		};
 		// 일반 지도와 스카이뷰로 지도 타입을 전환할 수 있는 지도타입 컨트롤을 생성함
 		var mapTypeControl = new kakao.maps.MapTypeControl();
@@ -43,7 +49,9 @@
 		// 체크 박스를 선택하면 호출되는 함수입니다
 		function setOverlayMapTypeId() {
 			var chkTraffic = document.getElementById('chkTraffic'),
-				chkBicycle = document.getElementById('chkBicycle');
+				chkBicycle = document.getElementById('chkBicycle'),
+				chkTerrain = document.getElementById('chkTerrain'),
+				chkUseDistrict = document.getElementById('chkUseDistrict');
 			// 지도 타입을 제거합니다
 			for (var type in mapTypes) {
 				map.removeOverlayMapTypeId(mapTypes[type]);
@@ -57,6 +65,14 @@
 			// 자전거도로정보 체크박스가 체크되어있으면 지도에 자전거도로정보 지도타입을 추가합니다
 			if (chkBicycle.checked) {
 				map.addOverlayMapTypeId(mapTypes.bicycle);
+			}
+			// 지적편집도정보 체크박스가 체크되어있으면 지도에 지적편집도정보 지도타입을 추가합니다
+			if (chkUseDistrict.checked) {
+				map.addOverlayMapTypeId(mapTypes.useDistrict);    
+			}
+			// 지형정보 체크박스가 체크되어있으면 지도에 지형정보 지도타입을 추가합니다
+			if (chkTerrain.checked) {
+				map.addOverlayMapTypeId(mapTypes.terrain);    
 			}
 		}
 	</script>

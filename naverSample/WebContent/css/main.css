@@ -49,3 +49,11 @@ input[id="chkBicycle"] {
 	width: 25px;
 	transform: scale(1.5);
 }
+input[id="chkTerrain"] {
+	width: 25px;
+	transform: scale(1.5);
+}
+input[id="chkUseDistrict"] {
+	width: 25px;
+	transform: scale(1.5);
+}
